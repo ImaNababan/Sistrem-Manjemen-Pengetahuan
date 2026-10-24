@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penentu Alur Pelayanan Pasien RSGM</title>
+  <meta name="description" content="Prototype pembelajaran Knowledge Management untuk alur pelayanan pendaftaran pasien di Rumah Sakit Gigi dan Mulut (RSGM) Maranatha berbasis aturan pakar." />
+  <meta property="og:title" content="Penentu Alur Pelayanan Pasien RSGM" />
+  <meta property="og:description" content="Prototype pembelajaran Knowledge Management untuk alur pelayanan pendaftaran pasien di Rumah Sakit Gigi dan Mulut (RSGM) Maranatha berbasis aturan pakar." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-subtle: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-light: #e0f2fe;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --danger-border: #f87171;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --warning-border: #fcd34d;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --badge-blue-bg: #dbeafe;
+      --badge-blue-text: #1e40af;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0b1120;
+      --card-bg: #1e293b;
+      --card-subtle: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #7dd3fc;
+      --primary-light: #164e63;
+      --danger: #f87171;
+      --danger-bg: #450a0a;
+      --danger-border: #991b1b;
+      --warning: #fbbf24;
+      --warning-bg: #451a03;
+      --warning-border: #92400e;
+      --success: #4ade80;
+      --success-bg: #052e16;
+      --success-border: #166534;
+      --badge-blue-bg: #1e3a8a;
+      --badge-blue-text: #93c5fd;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 16px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-titles h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .header-titles p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .sim-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--card-subtle);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    .btn-danger {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+
+    .btn-danger:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn-success {
+      background-color: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 0.78rem;
+    }
+
+    /* Tab Navigation */
+    .nav-tabs-wrapper {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 6px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .nav-tab-btn:hover {
+      background: var(--card-subtle);
+      color: var(--text-main);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    /* Tab Content Containers */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.15s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Panels */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .patient-banner {
+      background: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    /* Forms & Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .form-group label.field-label {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="time"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: auto;
+      background-image: none;
+      font-weight: 500;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .checkbox-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      background: var(--card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-item:hover {
+      border-color: var(--primary);
+    }
+
+    .conditional-subgroup {
+      padding: 12px;
+      background: var(--card-subtle);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 6px 6px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    /* Patient Search Grid */
+    .patient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .patient-card {
+      background: var(--card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .patient-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .patient-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .patient-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .patient-card-rm {
+      font-size: 0.78rem;
+      font-family: monospace;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .patient-card-body {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--badge-blue-bg);
+      color: var(--badge-blue-text);
+    }
+
+    .tag-warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .tag-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .tag-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    /* Accordion Details */
+    details.stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    details.stage-card[open] {
+      border-color: var(--primary);
+    }
+
+    summary.stage-header {
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      background: var(--card-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .stage-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Complaint Chip Group */
+    .complaint-group {
+      margin-bottom: 14px;
+    }
+
+    .complaint-group-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 3px;
+    }
+
+    .complaint-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 16px;
+      background: var(--card-subtle);
+      border: 1px solid var(--border-color);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .chip-item input {
+      margin: 0;
+    }
+
+    .chip-item:hover {
+      border-color: var(--primary);
+    }
+
+    .chip-item.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Tables */
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      text-align: left;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    table.data-table th {
+      background: var(--card-subtle);
+      font-weight: 700;
+    }
+
+    table.data-table tr:hover td {
+      background: var(--card-subtle);
+    }
+
+    /* Output Section */
+    .status-card {
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+
+    .status-card.status-red {
+      background-color: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .status-card.status-blue {
+      background-color: var(--badge-blue-bg);
+      border-color: #93c5fd;
+      color: var(--badge-blue-text);
+    }
+
+    .status-card-subtitle {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .status-card-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .rule-item {
+      background: var(--card-subtle);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .rule-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .rule-then {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    .rule-reason {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .alert-flag {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+
+    .alert-flag.warning {
+      background-color: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .alert-flag.info {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    footer {
+      margin-top: 24px;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="header-titles">
+      <h1>
+        <span>Penentu Alur Pelayanan Pasien RSGM</span>
+        <span class="sim-badge">Data Simulasi Pembelajaran KM</span>
+      </h1>
+      <p>Rumah Sakit Gigi dan Mulut Maranatha &bull; Workspace Interaktif Staf Pendaftaran</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="themeToggleBtn" type="button">🌓 Ganti Tema</button>
+      <button class="btn btn-danger" id="globalResetBtn" type="button">🔄 Reset Data Sesi</button>
+    </div>
+  </header>
+
+  <!-- Nav Tabs -->
+  <nav class="nav-tabs-wrapper">
+    <ul class="nav-tabs">
+      <li><button class="nav-tab-btn active" data-tab="tab-cari" type="button">🔍 1. Cari Pasien</button></li>
+      <li><button class="nav-tab-btn" data-tab="tab-profil" type="button">👤 2. Profil &amp; Riwayat</button></li>
+      <li><button class="nav-tab-btn" data-tab="tab-daftar" type="button">📝 3. Pendaftaran Kunjungan</button></li>
+      <li><button class="nav-tab-btn" data-tab="tab-hasil" type="button">🎯 4. Hasil Alur</button></li>
+      <li><button class="nav-tab-btn" data-tab="tab-antrean" type="button">📊 5. Antrean &amp; Jadwal</button></li>
+      <li><button class="nav-tab-btn" data-tab="tab-pakar" type="button">⚙️ 6. Parameter Pakar</button></li>
+    </ul>
+  </nav>
+
+  <!-- Patient Status Active Strip -->
+  <div id="activePatientBanner" class="patient-banner" style="display: none;">
+    <div>
+      <strong>Pasien Terpilih:</strong> <span id="bannerPatientName">-</span> (<span id="bannerPatientRM">-</span>)
+      &bull; Status: <span id="bannerPatientStatus" class="tag">Lama</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-sm btn-secondary" id="btnBannerProfil" type="button">Lihat Profil</button>
+      <button class="btn btn-sm btn-primary" id="btnBannerDaftar" type="button">Lanjut Pendaftaran ➔</button>
+    </div>
+  </div>
+
+  <!-- TAB 1: CARI PASIEN -->
+  <section id="tab-cari" class="tab-content active">
+    <div class="card">
+      <div class="card-title">
+        <span>Pencarian Pasien (Data Simulasi)</span>
+        <span class="tag tag-warning">Staf memulai pendaftaran dari pencarian</span>
+      </div>
+      <div class="form-group">
+        <label class="field-label" for="searchInput">Cari berdasarkan Nama atau Nomor Rekam Medis (RM):</label>
+        <input type="text" id="searchInput" placeholder="Ketik nama pasien (contoh: Budi, Siti, Andi, Dewi, Rudi, Maya, Kevin, Nanda) atau nomor RM...">
+        <span class="field-hint">Pencarian tidak peka huruf besar-kecil dan mendukung sebagian kata.</span>
+      </div>
+
+      <div id="patientSearchResults" class="patient-grid">
+        <!-- Dynamic cards -->
+      </div>
+
+      <!-- Not Found Container -->
+      <div id="notFoundBox" style="display: none; margin-top: 16px; padding: 16px; border: 1px dashed var(--danger-border); background: var(--danger-bg); border-radius: 8px;">
+        <h4 style="color: var(--danger); margin-bottom: 6px;">Pasien Tidak Ditemukan dalam Data Pasien Lama</h4>
+        <p style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 12px;">
+          Nama atau No RM tidak cocok dengan basis data rekam medis saat ini. Silakan tentukan jalur penanganan:
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button class="btn btn-primary" id="btnDaftarBaruAction" type="button">➕ Daftarkan Sebagai Pasien Baru</button>
+          <button class="btn btn-secondary" id="btnMengakuTerdaftarAction" type="button">⚠️ Pasien Mengaku Sudah Mendaftar</button>
+        </div>
+
+        <!-- Sub-form Pasien Baru -->
+        <div id="formPasienBaruInline" style="display: none; margin-top: 14px; padding: 14px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
+          <h5 style="margin-bottom: 10px;">Entri Singkat Pasien Baru:</h5>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="new_nama">Nama Lengkap:</label>
+              <input type="text" id="new_nama" placeholder="Nama pasien baru...">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="new_usia">Usia (Tahun):</label>
+              <input type="number" id="new_usia" value="25" min="1">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="new_telepon">No. Telepon / WA:</label>
+              <input type="text" id="new_telepon" placeholder="08xxxxxxxxxx">
+            </div>
+          </div>
+          <button class="btn btn-success" id="btnSimpanPasienBaru" type="button" style="margin-top: 10px;">Simpan &amp; Lanjut ke Pendaftaran Kunjungan</button>
+        </div>
+
+        <!-- Sub-form Pasien Mengaku Sudah Mendaftar -->
+        <div id="formKlaimTerdaftarInline" style="display: none; margin-top: 14px; padding: 14px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
+          <h5 style="color: var(--warning); margin-bottom: 6px;">Verifikasi Kasus Pasien Mengaku Terdaftar Tetapi Tidak Ditemukan:</h5>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+            Sesuai standar operasional, staf harus melakukan verifikasi identitas, jadwal, dan riwayat sebelum mengambil keputusan.
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+            <input type="text" id="verifInput" placeholder="Masukkan No RM lengkap atau No Telepon verifikasi..." style="flex: 1; min-width: 200px;">
+            <button class="btn btn-primary" id="btnLakukanVerifikasi" type="button">Verifikasi Ulang</button>
+          </div>
+          <div id="verifResultMsg" style="font-size: 0.84rem; font-weight: 600;"></div>
+          <div id="verifActionBtnContainer" style="margin-top: 10px; display: none;">
+            <button class="btn btn-secondary" id="btnLanjutSetelahKlaim" type="button">Lanjut ke Formulir Pendaftaran ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: PROFIL & RIWAYAT -->
+  <section id="tab-profil" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <span>Profil Pasien Terpilih</span>
+        <span id="profilStatusTag" class="tag">Pasien Lama</span>
+      </div>
+      <div id="profilDetailsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <!-- Dynamic profile info -->
+      </div>
+
+      <div id="bookingHariIniCard" style="margin-bottom: 16px; display: none;">
+        <!-- Dynamic booking card -->
+      </div>
+
+      <div class="card-title" style="font-size: 0.95rem; margin-top: 18px;">
+        <span>Riwayat Kunjungan Sebelumnya</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="riwayatTable">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Layanan / Poli</th>
+              <th>Keluhan</th>
+              <th>Dokter</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="riwayatTableBody">
+            <!-- Dynamic visits -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary" id="btnBukaPendaftaranDariProfil" type="button">Buka Formulir Pendaftaran Kunjungan ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: PENDAFTARAN KUNJUNGAN -->
+  <section id="tab-daftar" class="tab-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <h2 style="font-size: 1.15rem;">Formulir Pendaftaran &bull; Evaluasi Alur Pelayanan</h2>
+      <span class="field-hint">Nilai terisi otomatis dari data pasien. Staf mengonfirmasi/mengoreksi via dropdown.</span>
+    </div>
+
+    <form id="admissionForm" onsubmit="return false;">
+      <!-- TAHAP 1 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 1 &bull; Kondisi Pasien (Visual Pendaftaran)</span>
+          <span class="tag" id="badgeTahap1">Normal</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label">Kondisi yang terlihat langsung pada pasien (Centang jika ada):</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" name="kondisi_checkbox" value="perdarahan tidak berhenti">
+                Perdarahan tidak berhenti
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="kondisi_checkbox" value="pembengkakan wajah yang cukup parah">
+                Pembengkakan wajah yang cukup parah
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="kondisi_checkbox" value="kesulitan membuka mulut atau menelan">
+                Kesulitan membuka mulut atau menelan
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="kondisi_checkbox" value="cedera akibat kecelakaan">
+                Cedera akibat kecelakaan
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="kondisi_checkbox" value="kondisi lain yang mengkhawatirkan">
+                Kondisi lain yang mengkhawatirkan
+              </label>
+            </div>
+          </div>
+
+          <div id="subgroup-penilaian-medis" class="conditional-subgroup" style="display: none;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="penilaian_tenaga_medis">Penilaian Tenaga Medis (Dropdown Pilihan Tenaga Medis):</label>
+              <select id="penilaian_tenaga_medis">
+                <option value="Belum dinilai" selected>Belum dinilai</option>
+                <option value="Tidak Perlu Segera">Tidak Perlu Segera</option>
+                <option value="Perlu Segera">Perlu Segera</option>
+              </select>
+              <span class="field-hint">Staf pendaftaran tidak mendiagnosis; staf meneruskan hasil penilaian klinis perawat/dokter.</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 2 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 2 &bull; Status Pasien</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label" for="status_pasien">Status Pasien (Dropdown):</label>
+            <select id="status_pasien">
+              <option value="Lama" selected>Pasien Lama</option>
+              <option value="Baru">Pasien Baru</option>
+            </select>
+            <span class="field-hint">Otomatis terpilih berdasarkan hasil pencarian rekam medis.</span>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 3 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 3 &bull; Booking</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label" for="status_booking">Status Booking Hari Ini (Dropdown):</label>
+            <select id="status_booking">
+              <option value="Tidak Ada" selected>Tidak Ada (Walk-in)</option>
+              <option value="Ada">Ada Booking</option>
+            </select>
+          </div>
+
+          <div id="subgroup-booking" class="conditional-subgroup" style="display: none;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+              <div class="form-group">
+                <label class="field-label" for="jadwal_dokter_sesuai">Jadwal &amp; Dokter Booking Sesuai? (Dropdown):</label>
+                <select id="jadwal_dokter_sesuai">
+                  <option value="Ya" selected>Ya (Sesuai)</option>
+                  <option value="Tidak">Tidak Sesuai</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="field-label" for="jam_tiba_input">Jam Tiba Pasien:</label>
+                <input type="time" id="jam_tiba_input" value="09:15">
+              </div>
+              <div class="form-group">
+                <label class="field-label" for="jam_booking_input">Jam Booking Terdaftar:</label>
+                <input type="time" id="jam_booking_input" value="09:00">
+              </div>
+              <div class="form-group">
+                <label class="field-label" for="keterlambatan_menit">Keterlambatan (Menit):</label>
+                <input type="number" id="keterlambatan_menit" value="0" min="0">
+                <span class="field-hint">Dihitung otomatis: Jam Tiba - Jam Booking (min 0).</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case: Pasien punya nomor antrean hari ini -->
+          <div id="subgroup-nomor-antrean-ada" class="conditional-subgroup" style="display: none;">
+            <div class="form-group">
+              <label class="field-label" for="nomor_antrean_hilang_t3">Pemeriksaan Tiket Antrean (Nomor Antrean Hilang?):</label>
+              <select id="nomor_antrean_hilang_t3">
+                <option value="Tidak" selected>Tidak (Nomor Ada / Terbawa)</option>
+                <option value="Ya">Ya (Pasien Melapor Nomor Hilang)</option>
+              </select>
+            </div>
+            <div id="subgroup-hilang-verif-t3" class="form-group" style="display: none; margin-bottom: 0;">
+              <label class="field-label" for="antrean_terverifikasi_t3">Identitas dan Data Antrean Terverifikasi? (Dropdown):</label>
+              <select id="antrean_terverifikasi_t3">
+                <option value="Ya" selected>Ya (Terverifikasi)</option>
+                <option value="Tidak">Tidak</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 4 -->
+      <details class="stage-card" id="card-tahap-4" open>
+        <summary class="stage-header">
+          <span>Tahap 4 &bull; Walk-in (Hanya jika Tidak Ada Booking)</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label" for="select_walkin_dokter">Pilih Dokter Praktek Hari Ini (Dropdown):</label>
+            <select id="select_walkin_dokter">
+              <!-- Populated from doctor schedule -->
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <div class="form-group">
+              <label class="field-label" for="dokter_tersedia">Dokter Tersedia? (Dropdown):</label>
+              <select id="dokter_tersedia">
+                <option value="Ya" selected>Ya</option>
+                <option value="Tidak">Tidak</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="field-label" for="kapasitas_dokter">Kapasitas Dokter (Dropdown):</label>
+              <select id="kapasitas_dokter">
+                <option value="Tersedia" selected>Tersedia</option>
+                <option value="Penuh">Penuh</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 5 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 5 &bull; Keluhan &amp; Informasi Kesehatan</span>
+          <span class="tag" id="badgeTahap5">Pilih Keluhan</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label">Keluhan Pasien (Dapat Memilih Lebih dari Satu):</label>
+            <div id="complaintsContainer">
+              <!-- Dynamic Category Chips -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label" for="keluhan_tambahan">Keluhan Tambahan (Teks Bebas):</label>
+            <textarea id="keluhan_tambahan" placeholder="Catat rincian keluhan tambahan atau catatan staf di sini..."></textarea>
+          </div>
+
+          <!-- Status Keluhan Jelas (Dropdown) & Helper -->
+          <div style="padding: 12px; background: var(--card-subtle); border-radius: 6px; border: 1px solid var(--border-color);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; align-items: center;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="field-label" for="keluhan_jelas">Status Keluhan Jelas? (Dropdown):</label>
+                <select id="keluhan_jelas">
+                  <option value="Tidak" selected>Tidak (Perlu Penjelasan)</option>
+                  <option value="Ya">Ya (Keluhan Jelas &amp; Seragam)</option>
+                </select>
+              </div>
+              <div id="displayLayananTerkaitHelper" style="font-size: 0.82rem; color: var(--text-muted);">
+                Layanan terkait: - (Data contoh, perlu dikonfirmasi petugas)
+              </div>
+            </div>
+            <div id="sameLastVisitAlert" style="display: none; margin-top: 6px; font-size: 0.82rem; color: var(--primary); font-weight: 600;">
+              <!-- Same visit indicator -->
+            </div>
+            <div id="warningLuarMulut" style="display: none; margin-top: 6px;" class="alert-flag warning">
+              ⚠️ Di luar kelompok layanan gigi dan mulut. Konfirmasi ke petugas berwenang.
+            </div>
+          </div>
+
+          <div id="subgroup-keraguan" class="conditional-subgroup" style="display: none;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="keraguan_setelah_klarifikasi">Keraguan Setelah Klarifikasi (Dropdown):</label>
+              <select id="keraguan_setelah_klarifikasi">
+                <option value="Tidak Ada" selected>Tidak Ada Keraguan</option>
+                <option value="Ada">Ada Keraguan</option>
+              </select>
+              <span class="field-hint">Dipilih jika setelah bertanya lebih lanjut, arah layanan masih belum pasti.</span>
+            </div>
+          </div>
+
+          <!-- Informasi Kesehatan Penting -->
+          <div class="form-group" style="margin-top: 8px;">
+            <label class="field-label">Informasi Kesehatan Penting (Centang jika ada):</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" name="info_kesehatan_checkbox" value="riwayat penyakit tertentu">
+                Riwayat penyakit tertentu
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="info_kesehatan_checkbox" value="sedang hamil">
+                Sedang hamil
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="info_kesehatan_checkbox" value="mengonsumsi obat tertentu">
+                Mengonsumsi obat tertentu
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label" for="status_perubahan_info">Apakah informasi kesehatan ini masih berlaku / ada perubahan? (Dropdown):</label>
+            <select id="status_perubahan_info">
+              <option value="Tetap" selected>Masih Berlaku (Sama)</option>
+              <option value="Berubah">Ada Perubahan Informasi Pasien</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 6 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 6 &bull; Kasus Khusus (Antrean Hilang / Tidak Ditemukan)</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label" for="nomor_antrean_hilang">Nomor Antrean Hilang? (Dropdown):</label>
+            <select id="nomor_antrean_hilang">
+              <option value="Tidak" selected>Tidak</option>
+              <option value="Ya">Ya (Nomor Antrean Hilang)</option>
+            </select>
+          </div>
+
+          <div id="subgroup-antrean-hilang" class="conditional-subgroup" style="display: none;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="antrean_terverifikasi">Identitas dan Data Antrean Terverifikasi? (Dropdown):</label>
+              <select id="antrean_terverifikasi">
+                <option value="Ya" selected>Ya (Terverifikasi)</option>
+                <option value="Tidak">Tidak</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label" for="pasien_tidak_ditemukan">Pasien Mengaku Sudah Mendaftar Tetapi Tidak Ditemukan Dalam Antrean? (Dropdown):</label>
+            <select id="pasien_tidak_ditemukan">
+              <option value="Tidak" selected>Tidak</option>
+              <option value="Ya">Ya</option>
+            </select>
+          </div>
+
+          <div id="subgroup-tidak-ditemukan" class="conditional-subgroup" style="display: none;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="field-label" for="pasien_ditemukan_verif">Pasien Ditemukan Setelah Verifikasi? (Dropdown):</label>
+              <select id="pasien_ditemukan_verif">
+                <option value="Tidak" selected>Tidak</option>
+                <option value="Ya">Ya (Ditemukan)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- TAHAP 7 -->
+      <details class="stage-card" open>
+        <summary class="stage-header">
+          <span>Tahap 7 &bull; Kesinambungan Informasi</span>
+        </summary>
+        <div class="stage-body">
+          <div class="form-group">
+            <label class="field-label" for="info_diperlukan_berikutnya">Informasi Diperlukan Petugas Berikutnya? (Dropdown):</label>
+            <select id="info_diperlukan_berikutnya">
+              <option value="Ya" selected>Ya</option>
+              <option value="Tidak">Tidak</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="info_pasien_belum_jelas">Informasi Pasien Belum Jelas? (Dropdown):</label>
+            <select id="info_pasien_belum_jelas">
+              <option value="Tidak" selected>Tidak</option>
+              <option value="Ya">Ya</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label" for="info_pasien_berubah">Informasi Pasien Berubah? (Dropdown):</label>
+            <select id="info_pasien_berubah">
+              <option value="Tidak" selected>Tidak</option>
+              <option value="Ya">Ya</option>
+            </select>
+          </div>
+        </div>
+      </details>
+    </form>
+
+    <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+      <button class="btn btn-primary" id="btnLihatHasilAlurDariDaftar" type="button">Lihat Hasil Keputusan Alur ➔</button>
+    </div>
+  </section>
+
+  <!-- TAB 4: HASIL ALUR -->
+  <section id="tab-hasil" class="tab-content">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+      <!-- Status Utama Card -->
+      <div id="statusUtamaCard" class="status-card status-blue">
+        <div class="status-card-subtitle">STATUS UTAMA ALUR PELAYANAN</div>
+        <div id="statusUtamaText" class="status-card-value">ALUR PENDAFTARAN BIASA</div>
+      </div>
+
+      <!-- Rules Triggered -->
+      <div class="card">
+        <div class="card-title">
+          <span>📋 Aturan Pakar yang Terpicu (RULE 1 - 21)</span>
+          <span id="triggeredCountBadge" class="tag">0 Aturan</span>
+        </div>
+        <div id="triggeredRulesContainer">
+          <!-- Dynamic list of triggered rules -->
+        </div>
+      </div>
+
+      <!-- Catatan Petugas Berikutnya & Handover -->
+      <div class="card">
+        <div class="card-title">
+          <span>📝 Catatan Serah Terima untuk Petugas Berikutnya</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" id="btnSalinRingkasan" type="button">📋 Salin Ringkasan Serah Terima</button>
+            <button class="btn btn-success btn-sm" id="btnSimpanKunjungan" type="button">💾 Simpan Kunjungan ke Antrean Hari Ini</button>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
+          <div style="padding: 8px 12px; background: var(--card-subtle); border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong>Identitas:</strong> <span id="handoverPatientIdent">-</span>
+          </div>
+          <div style="padding: 8px 12px; background: var(--card-subtle); border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong>Keluhan yang Tercatat:</strong>
+            <div id="handoverKeluhanDisplay" style="margin-top: 4px;">-</div>
+          </div>
+          <div style="padding: 8px 12px; background: var(--card-subtle); border-radius: 6px; border: 1px solid var(--border-color);">
+            <strong>Informasi Kesehatan Penting:</strong>
+            <div id="handoverInfoKesDisplay" style="margin-top: 4px;">-</div>
+          </div>
+          <div id="handoverAlertsContainer">
+            <!-- Dynamic alerts for rule 15 and 21 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: ANTREAN & JADWAL -->
+  <section id="tab-antrean" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <span>📊 Antrean Pasien Hari Ini</span>
+        <span class="tag tag-warning">Sesi Memori</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="antreanTable">
+          <thead>
+            <tr>
+              <th>No Antrean</th>
+              <th>Nama Pasien</th>
+              <th>No RM</th>
+              <th>Layanan / Poli</th>
+              <th>Dokter</th>
+              <th>Waktu / Jalur</th>
+              <th>Status Keputusan Alur</th>
+            </tr>
+          </thead>
+          <tbody id="antreanTableBody">
+            <!-- Populated from memory -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>👨‍⚕️ Jadwal Dokter Gigi Hari Ini</span>
+        <span class="tag">RSGM Maranatha</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="dokterTable">
+          <thead>
+            <tr>
+              <th>Nama Dokter</th>
+              <th>Layanan / Spesialisasi</th>
+              <th>Sisa Kuota</th>
+              <th>Status Penerimaan</th>
+            </tr>
+          </thead>
+          <tbody id="dokterTableBody">
+            <!-- Populated from memory -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 6: PARAMETER PAKAR -->
+  <section id="tab-pakar" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <span>⚙️ Panel Parameter Pakar (Knowledge Engineering)</span>
+        <span class="tag tag-warning">Dapat Diubah Saat Demo</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div class="form-group">
+          <label class="field-label" for="param_batas_terlambat">Batas Toleransi Terlambat (Menit):</label>
+          <input type="number" id="param_batas_terlambat" value="10" min="0">
+          <span class="field-hint">10 menit hanyalah contoh. Batas pasti mengikuti aturan RSGM.</span>
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="param_aturan_batas">Status Aturan Batas Keterlambatan (Dropdown):</label>
+          <select id="param_aturan_batas">
+            <option value="Belum jelas" selected>Belum jelas</option>
+            <option value="Sudah jelas">Sudah jelas</option>
+          </select>
+          <span class="field-hint">Mempengaruhi pemicuan RULE 9 bila bernilai 'Belum jelas'.</span>
+        </div>
+      </div>
+      <div style="margin-top: 12px; font-size: 0.84rem; color: var(--text-muted); background: var(--card-subtle); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+        <strong>Keterangan Pengujian:</strong> Parameter di atas langsung memicu RULE 7 (keterlambatan &le; batas), RULE 8 (keterlambatan &gt; batas), dan RULE 9 (aturan belum jelas). Ubah angka untuk mengamati adaptasi logika pakar seketika.
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Disclaimer -->
+  <footer>
+    Prototype pembelajaran dengan data simulasi. Angka 10 menit adalah contoh dan perlu divalidasi staf RSGM. Keputusan akhir tetap oleh petugas dan tenaga kesehatan.
+  </footer>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast">Notifikasi</div>
+
+<script>
+  // CONSTANTS & SIMULATED DATA
+  const TODAY_STR = new Date().toISOString().slice(0, 10);
+
+  const INITIAL_DOCTORS = [
+    { nama: "drg. Anita, Sp.KG", layanan: "Konservasi", kuota: 3, status: "menerima pasien" },
+    { nama: "drg. Bambang, Sp.Perio", layanan: "Periodonsia", kuota: 0, status: "tidak menerima" },
+    { nama: "drg. Cindy, Sp.Ort", layanan: "Ortodonti", kuota: 2, status: "menerima pasien" },
+    { nama: "drg. Dedi, Sp.BM", layanan: "Bedah Mulut", kuota: 0, status: "tidak menerima" },
+    { nama: "drg. Farhan, Sp.KGA", layanan: "Dokter Gigi Anak", kuota: 4, status: "menerima pasien" }
+  ];
+
+  const INITIAL_PATIENTS = [
+    {
+      no_rm: "RM-2023-0101",
+      nama: "Budi Santoso",
+      usia: 42,
+      no_telepon: "0812-3456-7890",
+      riwayat_kunjungan: [
+        { tanggal: "2026-08-10", layanan: "Konservasi", keluhan: "Gigi berlubang", dokter: "drg. Anita, Sp.KG", status: "Selesai" },
+        { tanggal: "2026-05-14", layanan: "Konservasi", keluhan: "Tambalan lepas", dokter: "drg. Anita, Sp.KG", status: "Selesai" },
+        { tanggal: "2025-11-20", layanan: "Periodonsia", keluhan: "Karang gigi", dokter: "drg. Bambang, Sp.Perio", status: "Selesai" },
+        { tanggal: "2025-06-03", layanan: "Konservasi", keluhan: "Gigi ngilu", dokter: "drg. Anita, Sp.KG", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: { dokter: "drg. Anita, Sp.KG", layanan: "Konservasi", jam: "09:00", tanggal: TODAY_STR },
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2022-0452",
+      nama: "Siti Aminah",
+      usia: 35,
+      no_telepon: "0813-9876-5432",
+      riwayat_kunjungan: [
+        { tanggal: "2026-09-01", layanan: "Ortodonti", keluhan: "Kontrol kawat gigi", dokter: "drg. Cindy, Sp.Ort", status: "Selesai" },
+        { tanggal: "2026-08-01", layanan: "Ortodonti", keluhan: "Kontrol kawat gigi", dokter: "drg. Cindy, Sp.Ort", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: { dokter: "drg. Cindy, Sp.Ort", layanan: "Ortodonti", jam: "10:30", tanggal: TODAY_STR },
+      nomor_antrean_hari_ini: "B-014"
+    },
+    {
+      no_rm: "RM-2024-0089",
+      nama: "Andi Pratama",
+      usia: 28,
+      no_telepon: "0856-1122-3344",
+      riwayat_kunjungan: [
+        { tanggal: "2026-02-15", layanan: "Bedah Mulut", keluhan: "Ingin cabut gigi", dokter: "drg. Dedi, Sp.BM", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: null,
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2023-0871",
+      nama: "Dewi Lestari",
+      usia: 30,
+      no_telepon: "0877-4455-6677",
+      riwayat_kunjungan: [
+        { tanggal: "2026-07-22", layanan: "Periodonsia", keluhan: "Gusi berdarah", dokter: "drg. Bambang, Sp.Perio", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: ["sedang hamil"],
+      booking_hari_ini: null,
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2021-0329",
+      nama: "Rudi Hartono",
+      usia: 58,
+      no_telepon: "0812-7788-9900",
+      riwayat_kunjungan: [
+        { tanggal: "2026-06-18", layanan: "Prostodonsia", keluhan: "Pasang gigi tiruan", dokter: "drg. Eka, Sp.Pros", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: ["riwayat penyakit tertentu", "mengonsumsi obat tertentu"],
+      booking_hari_ini: null,
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2025-0115",
+      nama: "Maya Putri",
+      usia: 8,
+      no_telepon: "0819-2233-4455",
+      riwayat_kunjungan: [
+        { tanggal: "2026-04-10", layanan: "Dokter Gigi Anak", keluhan: "Keluhan gigi anak", dokter: "drg. Farhan, Sp.KGA", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: { dokter: "drg. Farhan, Sp.KGA", layanan: "Dokter Gigi Anak", jam: "13:00", tanggal: TODAY_STR },
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2024-0567",
+      nama: "Kevin Wijaya",
+      usia: 24,
+      no_telepon: "0857-9988-7766",
+      riwayat_kunjungan: [
+        { tanggal: "2026-03-05", layanan: "Konservasi", keluhan: "Gigi ngilu", dokter: "drg. Anita, Sp.KG", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: { dokter: "drg. Anita, Sp.KG", layanan: "Konservasi", jam: "11:00", tanggal: "2026-10-28" },
+      nomor_antrean_hari_ini: null
+    },
+    {
+      no_rm: "RM-2020-0012",
+      nama: "Nanda Rahma",
+      usia: 38,
+      no_telepon: "0811-2345-6789",
+      riwayat_kunjungan: [
+        { tanggal: "2024-08-12", layanan: "Periodonsia", keluhan: "Karang gigi", dokter: "drg. Bambang, Sp.Perio", status: "Selesai" }
+      ],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: null,
+      nomor_antrean_hari_ini: null
+    }
+  ];
+
+  const INITIAL_QUEUE = [
+    { no: "B-001", nama: "Budi Purnomo", rm: "RM-2021-0021", layanan: "Konservasi", dokter: "drg. Anita, Sp.KG", waktu: "08:30 (Booking)", status: "Selesai - Rekam Medis Ditemukan" },
+    { no: "B-002", nama: "Rina Melati", rm: "RM-2024-0312", layanan: "Periodonsia", dokter: "drg. Bambang, Sp.Perio", waktu: "08:45 (Booking)", status: "Selesai" },
+    { no: "B-003", nama: "Johan Wijaya", rm: "RM-2022-0988", layanan: "Ortodonti", dokter: "drg. Cindy, Sp.Ort", waktu: "09:00 (Booking)", status: "Selesai" },
+    { no: "B-004", nama: "Fitri Handayani", rm: "RM-2023-0441", layanan: "Konservasi", dokter: "drg. Anita, Sp.KG", waktu: "09:15 (Booking)", status: "Dilayani di Poli" },
+    { no: "W-001", nama: "Hendra Gunawan", rm: "(Pasien Baru)", layanan: "Dokter Gigi Anak", dokter: "drg. Farhan, Sp.KGA", waktu: "09:30 (Walk-in)", status: "Menunggu Antrean Walk-in" },
+    { no: "B-005", nama: "Ratna Sari", rm: "RM-2023-0782", layanan: "Konservasi", dokter: "drg. Anita, Sp.KG", waktu: "09:45 (Booking)", status: "Menunggu di Ruang Tunggu" },
+    { no: "W-002", nama: "Joko Susilo", rm: "RM-2022-0199", layanan: "Ortodonti", dokter: "drg. Cindy, Sp.Ort", waktu: "10:00 (Walk-in)", status: "Menunggu Antrean Walk-in" },
+    { no: "B-006", nama: "Agnes Monica", rm: "RM-2021-0811", layanan: "Ortodonti", dokter: "drg. Cindy, Sp.Ort", waktu: "10:15 (Booking)", status: "Menunggu" },
+    { no: "B-014", nama: "Siti Aminah", rm: "RM-2022-0452", layanan: "Ortodonti", dokter: "drg. Cindy, Sp.Ort", waktu: "10:30 (Booking)", status: "Nomor Antrean Terbit" },
+    { no: "W-003", nama: "Bambang Tri", rm: "RM-2024-0992", layanan: "Dokter Gigi Anak", dokter: "drg. Farhan, Sp.KGA", waktu: "10:45 (Walk-in)", status: "Menunggu" },
+    { no: "B-007", nama: "Yusuf Mansur", rm: "RM-2023-0301", layanan: "Konservasi", dokter: "drg. Anita, Sp.KG", waktu: "11:00 (Booking)", status: "Menunggu" }
+  ];
+
+  const COMPLAINT_GROUPS = [
+    {
+      group: "GIGI",
+      items: [
+        { id: "c_lubang", label: "Gigi berlubang", layanan: "Konservasi", jelas: "Ya" },
+        { id: "c_ngilu", label: "Gigi ngilu", layanan: "Konservasi", jelas: "Ya" },
+        { id: "c_sakit_nyeri", label: "Sakit gigi (nyeri terus-menerus)", layanan: "Konservasi", jelas: "Tidak" },
+        { id: "c_lepas", label: "Tambalan lepas", layanan: "Konservasi", jelas: "Ya" },
+        { id: "c_patah", label: "Gigi patah/retak", layanan: "Konservasi", jelas: "Ya" },
+        { id: "c_goyang", label: "Gigi goyang", layanan: "-", jelas: "Tidak" },
+        { id: "c_sakit_goyang", label: "Gigi sakit dan goyang", layanan: "-", jelas: "Tidak" }
+      ]
+    },
+    {
+      group: "GUSI",
+      items: [
+        { id: "c_berdarah", label: "Gusi berdarah", layanan: "Periodonsia", jelas: "Ya" },
+        { id: "c_bengkak", label: "Gusi bengkak", layanan: "Periodonsia", jelas: "Tidak" },
+        { id: "c_karang", label: "Karang gigi", layanan: "Periodonsia", jelas: "Ya" },
+        { id: "c_bau", label: "Bau mulut", layanan: "Periodonsia", jelas: "Tidak" }
+      ]
+    },
+    {
+      group: "BEDAH",
+      items: [
+        { id: "c_cabut", label: "Ingin cabut gigi", layanan: "Bedah Mulut", jelas: "Ya" },
+        { id: "c_bungsu", label: "Gigi bungsu", layanan: "Bedah Mulut", jelas: "Ya" }
+      ]
+    },
+    {
+      group: "ORTODONTI",
+      items: [
+        { id: "c_pasang_kawat", label: "Pasang kawat gigi", layanan: "Ortodonti", jelas: "Ya" },
+        { id: "c_kontrol_kawat", label: "Kontrol kawat gigi", layanan: "Ortodonti", jelas: "Ya" }
+      ]
+    },
+    {
+      group: "GIGI TIRUAN",
+      items: [
+        { id: "c_pasang_tiruan", label: "Pasang gigi tiruan", layanan: "Prostodonsia", jelas: "Ya" },
+        { id: "c_tiruan_patah", label: "Gigi tiruan patah/longgar", layanan: "Prostodonsia", jelas: "Ya" }
+      ]
+    },
+    {
+      group: "ANAK",
+      items: [
+        { id: "c_anak", label: "Keluhan gigi anak", layanan: "Dokter Gigi Anak", jelas: "Ya" }
+      ]
+    },
+    {
+      group: "MULUT & RAHANG",
+      items: [
+        { id: "c_sariawan", label: "Sariawan", layanan: "-", jelas: "Tidak" },
+        { id: "c_benjolan", label: "Benjolan atau luka di mulut", layanan: "-", jelas: "Tidak" },
+        { id: "c_rahang", label: "Nyeri atau bunyi pada rahang", layanan: "-", jelas: "Tidak" }
+      ]
+    },
+    {
+      group: "KONTROL & LAINNYA",
+      items: [
+        { id: "c_kontrol_post", label: "Kontrol setelah tindakan", layanan: "sesuai dokter sebelumnya", jelas: "Ya" },
+        { id: "c_obat", label: "Pengambilan obat atau konsultasi hasil", layanan: "-", jelas: "Ya" }
+      ]
+    },
+    {
+      group: "DI LUAR GIGI DAN MULUT",
+      items: [
+        { id: "c_umum", label: "Keluhan umum (demam, batuk, dan sebagainya)", layanan: "-", jelas: "Tidak" }
+      ]
+    }
+  ];
+
+  // IN-MEMORY STATE (SESSION ONLY, NO localStorage)
+  let doctors = JSON.parse(JSON.stringify(INITIAL_DOCTORS));
+  let patients = JSON.parse(JSON.stringify(INITIAL_PATIENTS));
+  let queue = JSON.parse(JSON.stringify(INITIAL_QUEUE));
+  let currentPatient = null;
+  let currentTriggeredRules = [];
+  let lastDecisionStatus = "ALUR PENDAFTARAN BIASA";
+
+  // UI ELEMENTS
+  const tabButtons = document.querySelectorAll('.nav-tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const activePatientBanner = document.getElementById('activePatientBanner');
+  const bannerPatientName = document.getElementById('bannerPatientName');
+  const bannerPatientRM = document.getElementById('bannerPatientRM');
+  const bannerPatientStatus = document.getElementById('bannerPatientStatus');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const globalResetBtn = document.getElementById('globalResetBtn');
+  const toastEl = document.getElementById('toast');
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.style.display = 'block';
+    setTimeout(() => { toastEl.style.display = 'none'; }, 2600);
+  }
+
+  // TAB NAVIGATION
+  function switchTab(tabId) {
+    tabButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+    });
+    tabContents.forEach(content => {
+      content.classList.toggle('active', content.id === tabId);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+  });
+
+  document.getElementById('btnBannerProfil').addEventListener('click', () => switchTab('tab-profil'));
+  document.getElementById('btnBannerDaftar').addEventListener('click', () => switchTab('tab-daftar'));
+  document.getElementById('btnBukaPendaftaranDariProfil').addEventListener('click', () => switchTab('tab-daftar'));
+  document.getElementById('btnLihatHasilAlurDariDaftar').addEventListener('click', () => switchTab('tab-hasil'));
+
+  // THEME TOGGLE
+  themeToggleBtn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+  });
+
+  // RENDER COMPLAINTS CHIPS
+  const complaintsContainer = document.getElementById('complaintsContainer');
+  function initComplaintsUI() {
+    complaintsContainer.innerHTML = '';
+    COMPLAINT_GROUPS.forEach(grp => {
+      const grpDiv = document.createElement('div');
+      grpDiv.className = 'complaint-group';
+      
+      const title = document.createElement('div');
+      title.className = 'complaint-group-title';
+      title.textContent = grp.group;
+      grpDiv.appendChild(title);
+
+      const chipsDiv = document.createElement('div');
+      chipsDiv.className = 'complaint-chips';
+
+      grp.items.forEach(item => {
+        const label = document.createElement('label');
+        label.className = 'chip-item';
+        label.innerHTML = `<input type="checkbox" name="complaint_chip" value="${item.id}"> ${item.label}`;
+        chipsDiv.appendChild(label);
+      });
+
+      grpDiv.appendChild(chipsDiv);
+      complaintsContainer.appendChild(grpDiv);
+    });
+  }
+
+  // RENDER DOCTORS IN SELECT & TABLE
+  function renderDoctorsUI() {
+    const select = document.getElementById('select_walkin_dokter');
+    select.innerHTML = '';
+    const tbody = document.getElementById('dokterTableBody');
+    tbody.innerHTML = '';
+
+    doctors.forEach((doc) => {
+      // Select option
+      const opt = document.createElement('option');
+      opt.value = doc.nama;
+      opt.textContent = `${doc.nama} - ${doc.layanan} (Sisa Kuota: ${doc.kuota})`;
+      select.appendChild(opt);
+
+      // Table row
+      const tr = document.createElement('tr');
+      const statusBadge = doc.status === 'menerima pasien' 
+        ? '<span class="tag tag-success">Menerima Pasien</span>'
+        : '<span class="tag tag-danger">Tidak Menerima</span>';
+      tr.innerHTML = `
+        <td><strong>${doc.nama}</strong></td>
+        <td>${doc.layanan}</td>
+        <td>${doc.kuota}</td>
+        <td>${statusBadge}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // RENDER QUEUE TABLE
+  function renderQueueUI() {
+    const tbody = document.getElementById('antreanTableBody');
+    tbody.innerHTML = '';
+    queue.forEach(q => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong style="color:var(--primary); font-family:monospace;">${q.no}</strong></td>
+        <td>${q.nama}</td>
+        <td>${q.rm}</td>
+        <td>${q.layanan}</td>
+        <td>${q.dokter}</td>
+        <td>${q.waktu}</td>
+        <td><span class="tag">${q.status}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // SEARCH PATIENTS
+  const searchInput = document.getElementById('searchInput');
+  const patientSearchResults = document.getElementById('patientSearchResults');
+  const notFoundBox = document.getElementById('notFoundBox');
+
+  function renderSearchPatients(query = '') {
+    const q = query.trim().toLowerCase();
+    patientSearchResults.innerHTML = '';
+    notFoundBox.style.display = 'none';
+
+    const filtered = patients.filter(p => 
+      p.nama.toLowerCase().includes(q) || p.no_rm.toLowerCase().includes(q)
+    );
+
+    if (filtered.length === 0) {
+      notFoundBox.style.display = 'block';
+      return;
+    }
+
+    filtered.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'patient-card';
+      const hasBooking = p.booking_hari_ini ? '<span class="tag tag-success">Ada Booking Hari Ini</span>' : '<span class="tag">Tanpa Booking</span>';
+      const hasAntrean = p.nomor_antrean_hari_ini ? `<span class="tag tag-warning">Antrean: ${p.nomor_antrean_hari_ini}</span>` : '';
+      const lastVisit = p.riwayat_kunjungan.length > 0 ? p.riwayat_kunjungan[0].tanggal : 'Belum ada';
+
+      card.innerHTML = `
+        <div>
+          <div class="patient-card-header">
+            <div class="patient-card-name">${p.nama} (${p.usia} thn)</div>
+            <span class="patient-card-rm">${p.no_rm}</span>
+          </div>
+          <div class="patient-card-body" style="margin-top:8px;">
+            <div>Telp: ${p.no_telepon}</div>
+            <div>Kunjungan Terakhir: ${lastVisit}</div>
+            <div style="margin-top: 6px; display:flex; gap:4px; flex-wrap:wrap;">
+              ${hasBooking} ${hasAntrean}
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" type="button" style="margin-top:6px; width:100%;">Pilih Pasien Ini ➔</button>
+      `;
+
+      card.addEventListener('click', () => selectPatient(p));
+      patientSearchResults.appendChild(card);
+    });
+  }
+
+  searchInput.addEventListener('input', (e) => {
+    renderSearchPatients(e.target.value);
+  });
+
+  // SELECT PATIENT
+  function selectPatient(patient) {
+    currentPatient = patient;
+
+    // Update Active Banner
+    activePatientBanner.style.display = 'flex';
+    bannerPatientName.textContent = patient.nama;
+    bannerPatientRM.textContent = patient.no_rm;
+    bannerPatientStatus.textContent = patient.no_rm.includes("Baru") ? "Pasien Baru" : "Pasien Lama";
+    bannerPatientStatus.className = patient.no_rm.includes("Baru") ? "tag tag-warning" : "tag";
+
+    // Populate Tab 2 (Profil & Riwayat)
+    populateProfileTab(patient);
+
+    // Pre-fill Tab 3 (Pendaftaran)
+    autofillAdmissionForm(patient);
+
+    // Run rule evaluation
+    evaluateRules();
+
+    showToast(`Pasien ${patient.nama} dipilih.`);
+    switchTab('tab-profil');
+  }
+
+  function populateProfileTab(patient) {
+    const profilGrid = document.getElementById('profilDetailsGrid');
+    const profilStatusTag = document.getElementById('profilStatusTag');
+    const isNew = patient.no_rm.includes("Baru");
+    profilStatusTag.textContent = isNew ? "Pasien Baru" : "Pasien Lama";
+    profilStatusTag.className = isNew ? "tag tag-warning" : "tag";
+
+    // Calculate stats
+    const totalVisits = patient.riwayat_kunjungan.length;
+    
+    // Most frequent service
+    const countMap = {};
+    patient.riwayat_kunjungan.forEach(v => { countMap[v.layanan] = (countMap[v.layanan] || 0) + 1; });
+    let mostFreq = "-";
+    let maxCount = 0;
+    for (let k in countMap) {
+      if (countMap[k] > maxCount) {
+        maxCount = countMap[k];
+        mostFreq = `${k} (${maxCount}x)`;
+      }
+    }
+
+    const healthInfoStr = patient.informasi_kesehatan_tercatat.length > 0 
+      ? patient.informasi_kesehatan_tercatat.join(', ') 
+      : "Tidak ada catatan penyakit/alergi khusus";
+
+    profilGrid.innerHTML = `
+      <div class="card" style="margin-bottom:0; background:var(--card-subtle);">
+        <strong style="font-size:0.8rem; color:var(--text-muted);">NAMA PASIEN</strong>
+        <div style="font-weight:700;">${patient.nama} (${patient.usia} thn)</div>
+        <div style="font-size:0.82rem; color:var(--text-muted);">No. Telp: ${patient.no_telepon}</div>
+      </div>
+      <div class="card" style="margin-bottom:0; background:var(--card-subtle);">
+        <strong style="font-size:0.8rem; color:var(--text-muted);">NO. REKAM MEDIS</strong>
+        <div style="font-weight:700; font-family:monospace; color:var(--primary);">${patient.no_rm}</div>
+        <div style="font-size:0.82rem;">Status: ${isNew ? 'Pasien Baru' : 'Pasien Lama'}</div>
+      </div>
+      <div class="card" style="margin-bottom:0; background:var(--card-subtle);">
+        <strong style="font-size:0.8rem; color:var(--text-muted);">STATISTIK KUNJUNGAN</strong>
+        <div style="font-weight:700;">${totalVisits} Kunjungan</div>
+        <div style="font-size:0.82rem;">Layanan Terbanyak: ${mostFreq}</div>
+      </div>
+      <div class="card" style="margin-bottom:0; background:var(--card-subtle);">
+        <strong style="font-size:0.8rem; color:var(--text-muted);">INFO KESEHATAN TERCATAT</strong>
+        <div style="font-weight:600; color:${patient.informasi_kesehatan_tercatat.length > 0 ? 'var(--danger)' : 'var(--text-main)'};">${healthInfoStr}</div>
+      </div>
+    `;
+
+    // Booking card
+    const bookingCard = document.getElementById('bookingHariIniCard');
+    if (patient.booking_hari_ini) {
+      const b = patient.booking_hari_ini;
+      bookingCard.style.display = 'block';
+      bookingCard.innerHTML = `
+        <div style="padding:12px 16px; background:var(--primary-light); border:1px solid var(--primary); border-radius:8px;">
+          <h4 style="color:var(--primary); margin-bottom:6px;">📅 Rincian Booking Terdaftar:</h4>
+          <div style="font-size:0.88rem;">
+            <strong>Dokter:</strong> ${b.dokter} &bull; <strong>Layanan:</strong> ${b.layanan}<br>
+            <strong>Jam Booking:</strong> ${b.jam} WIB &bull; <strong>Tanggal:</strong> ${b.tanggal} 
+            ${b.tanggal === TODAY_STR ? '<span class="tag tag-success">Hari Ini</span>' : '<span class="tag tag-danger">Bukan Hari Ini</span>'}<br>
+            <strong>Nomor Antrean:</strong> ${patient.nomor_antrean_hari_ini || 'Belum diterbitkan'}
+          </div>
+        </div>
+      `;
+    } else {
+      bookingCard.style.display = 'none';
+    }
+
+    // Visits table
+    const tbody = document.getElementById('riwayatTableBody');
+    tbody.innerHTML = '';
+    if (patient.riwayat_kunjungan.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Belum ada riwayat kunjungan.</td></tr>`;
+    } else {
+      patient.riwayat_kunjungan.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${v.tanggal}</td>
+          <td><strong>${v.layanan}</strong></td>
+          <td>${v.keluhan}</td>
+          <td>${v.dokter}</td>
+          <td><span class="tag tag-success">${v.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  }
+
+  // AUTO-FILL TAHAP 1-7 DARI PATIENT DATA
+  function autofillAdmissionForm(patient) {
+    const isNew = patient.no_rm.includes("Baru");
+
+    // Tahap 2: Status Pasien Dropdown
+    document.getElementById('status_pasien').value = isNew ? 'Baru' : 'Lama';
+
+    // Tahap 3: Booking Dropdown
+    if (patient.booking_hari_ini) {
+      document.getElementById('status_booking').value = 'Ada';
+      const isToday = patient.booking_hari_ini.tanggal === TODAY_STR;
+      document.getElementById('jadwal_dokter_sesuai').value = isToday ? 'Ya' : 'Tidak';
+      document.getElementById('jam_booking_input').value = patient.booking_hari_ini.jam;
+      calculateLateMinutes();
+    } else {
+      document.getElementById('status_booking').value = 'Tidak Ada';
+      document.getElementById('keterlambatan_menit').value = '0';
+    }
+
+    // Antrean hilang dropdown sync
+    const subgroupAntreanAda = document.getElementById('subgroup-nomor-antrean-ada');
+    const selectHilangT3 = document.getElementById('nomor_antrean_hilang_t3');
+    const selectHilangT6 = document.getElementById('nomor_antrean_hilang');
+    selectHilangT3.value = 'Tidak';
+    selectHilangT6.value = 'Tidak';
+    document.getElementById('subgroup-hilang-verif-t3').style.display = 'none';
+    document.getElementById('subgroup-antrean-hilang').style.display = 'none';
+
+    if (patient.nomor_antrean_hari_ini) {
+      subgroupAntreanAda.style.display = 'block';
+    } else {
+      subgroupAntreanAda.style.display = 'none';
+    }
+
+    // Tahap 4: Walk-in sync with first available doctor
+    syncWalkinDoctor();
+
+    // Tahap 5: Info Kesehatan Checkboxes
+    const healthBoxes = document.querySelectorAll('input[name="info_kesehatan_checkbox"]');
+    healthBoxes.forEach(b => {
+      b.checked = patient.informasi_kesehatan_tercatat.includes(b.value);
+    });
+    document.getElementById('status_perubahan_info').value = 'Tetap';
+    document.getElementById('info_pasien_berubah').value = 'Tidak';
+
+    // Reset complaints chips & free text
+    document.querySelectorAll('input[name="complaint_chip"]').forEach(c => {
+      c.checked = false;
+      c.parentElement.classList.remove('active');
+    });
+    document.getElementById('keluhan_tambahan').value = '';
+
+    // Tahap 6 Kasus Khusus Dropdowns
+    document.getElementById('pasien_tidak_ditemukan').value = 'Tidak';
+    document.getElementById('pasien_ditemukan_verif').value = 'Tidak';
+  }
+
+  // TIME & LATE CALCULATION
+  function calculateLateMinutes() {
+    const jamTibaStr = document.getElementById('jam_tiba_input').value;
+    const jamBookingStr = document.getElementById('jam_booking_input').value;
+    if (!jamTibaStr || !jamBookingStr) return;
+
+    const [hT, mT] = jamTibaStr.split(':').map(Number);
+    const [hB, mB] = jamBookingStr.split(':').map(Number);
+    const diffMinutes = (hT * 60 + mT) - (hB * 60 + mB);
+    const late = Math.max(0, diffMinutes);
+    document.getElementById('keterlambatan_menit').value = late;
+  }
+
+  document.getElementById('jam_tiba_input').addEventListener('input', () => {
+    calculateLateMinutes();
+    evaluateRules();
+  });
+  document.getElementById('jam_booking_input').addEventListener('input', () => {
+    calculateLateMinutes();
+    evaluateRules();
+  });
+
+  // WALK-IN DOCTOR SYNC
+  function syncWalkinDoctor() {
+    const sel = document.getElementById('select_walkin_dokter');
+    const selectedDocName = sel.value;
+    const doc = doctors.find(d => d.nama === selectedDocName) || doctors[0];
+    if (doc) {
+      document.getElementById('dokter_tersedia').value = doc.status === 'menerima pasien' ? 'Ya' : 'Tidak';
+      document.getElementById('kapasitas_dokter').value = doc.kuota > 0 ? 'Tersedia' : 'Penuh';
+    }
+  }
+  document.getElementById('select_walkin_dokter').addEventListener('change', () => {
+    syncWalkinDoctor();
+    evaluateRules();
+  });
+
+  // TICKET NUMBER LOSS DROPDOWNS (SYNC T3 & T6)
+  const selHilangT3 = document.getElementById('nomor_antrean_hilang_t3');
+  const selHilangT6 = document.getElementById('nomor_antrean_hilang');
+  const selVerifT3 = document.getElementById('antrean_terverifikasi_t3');
+  const selVerifT6 = document.getElementById('antrean_terverifikasi');
+  const subHilangVerifT3 = document.getElementById('subgroup-hilang-verif-t3');
+  const subHilangVerifT6 = document.getElementById('subgroup-antrean-hilang');
+
+  selHilangT3.addEventListener('change', () => {
+    selHilangT6.value = selHilangT3.value;
+    const isHilang = selHilangT3.value === 'Ya';
+    subHilangVerifT3.style.display = isHilang ? 'block' : 'none';
+    subHilangVerifT6.style.display = isHilang ? 'block' : 'none';
+    evaluateRules();
+  });
+
+  selHilangT6.addEventListener('change', () => {
+    selHilangT3.value = selHilangT6.value;
+    const isHilang = selHilangT6.value === 'Ya';
+    subHilangVerifT3.style.display = isHilang ? 'block' : 'none';
+    subHilangVerifT6.style.display = isHilang ? 'block' : 'none';
+    evaluateRules();
+  });
+
+  selVerifT3.addEventListener('change', () => {
+    selVerifT6.value = selVerifT3.value;
+    evaluateRules();
+  });
+  selVerifT6.addEventListener('change', () => {
+    selVerifT3.value = selVerifT6.value;
+    evaluateRules();
+  });
+
+  // REGISTRATION ACTIONS FOR NEW PATIENTS / CLAIMED REGISTERED
+  document.getElementById('btnDaftarBaruAction').addEventListener('click', () => {
+    document.getElementById('formPasienBaruInline').style.display = 'block';
+    document.getElementById('formKlaimTerdaftarInline').style.display = 'none';
+  });
+
+  document.getElementById('btnMengakuTerdaftarAction').addEventListener('click', () => {
+    document.getElementById('formKlaimTerdaftarInline').style.display = 'block';
+    document.getElementById('formPasienBaruInline').style.display = 'none';
+    document.getElementById('pasien_tidak_ditemukan').value = 'Ya';
+    evaluateRules();
+  });
+
+  document.getElementById('btnSimpanPasienBaru').addEventListener('click', () => {
+    const nama = document.getElementById('new_nama').value.trim() || "Pasien Baru";
+    const usia = parseInt(document.getElementById('new_usia').value, 10) || 25;
+    const telp = document.getElementById('new_telepon').value.trim() || "08xxxxxxxxxx";
+    
+    const newPat = {
+      no_rm: "(Pasien Baru - Belum ada RM)",
+      nama: nama,
+      usia: usia,
+      no_telepon: telp,
+      riwayat_kunjungan: [],
+      informasi_kesehatan_tercatat: [],
+      booking_hari_ini: null,
+      nomor_antrean_hari_ini: null
+    };
+    patients.unshift(newPat);
+    selectPatient(newPat);
+    switchTab('tab-daftar');
+  });
+
+  document.getElementById('btnLakukanVerifikasi').addEventListener('click', () => {
+    const term = document.getElementById('verifInput').value.trim().toLowerCase();
+    const msgBox = document.getElementById('verifResultMsg');
+    const actionBtn = document.getElementById('verifActionBtnContainer');
+
+    if (!term) {
+      msgBox.style.color = "var(--danger)";
+      msgBox.textContent = "Masukkan nomor RM atau nomor telepon untuk verifikasi.";
+      return;
+    }
+
+    const matched = patients.find(p => p.no_rm.toLowerCase() === term || p.no_telepon.toLowerCase().replace(/[^0-9]/g, '').includes(term.replace(/[^0-9]/g, '')));
+
+    if (matched) {
+      document.getElementById('pasien_ditemukan_verif').value = 'Ya';
+      msgBox.style.color = "var(--success)";
+      msgBox.textContent = `Data Ditemukan! Pasien: ${matched.nama} (${matched.no_rm}).`;
+      actionBtn.style.display = 'block';
+      document.getElementById('btnLanjutSetelahKlaim').onclick = () => selectPatient(matched);
+    } else {
+      document.getElementById('pasien_ditemukan_verif').value = 'Tidak';
+      msgBox.style.color = "var(--danger)";
+      msgBox.textContent = "Data tetap tidak ditemukan setelah verifikasi identitas dan jadwal (Memicu RULE 19).";
+      actionBtn.style.display = 'block';
+      document.getElementById('btnLanjutSetelahKlaim').onclick = () => {
+        const tempPat = {
+          no_rm: "(Tidak Ditemukan - Dalam Konfirmasi)",
+          nama: searchInput.value.trim() || "Pasien Mengaku Terdaftar",
+          usia: 30,
+          no_telepon: term,
+          riwayat_kunjungan: [],
+          informasi_kesehatan_tercatat: [],
+          booking_hari_ini: null,
+          nomor_antrean_hari_ini: null
+        };
+        selectPatient(tempPat);
+        switchTab('tab-hasil');
+      };
+    }
+    evaluateRules();
+  });
+
+  // HEALTH INFO STATUS CHANGE LISTENER
+  document.getElementById('status_perubahan_info').addEventListener('change', (e) => {
+    document.getElementById('info_pasien_berubah').value = (e.target.value === 'Berubah') ? 'Ya' : 'Tidak';
+    evaluateRules();
+  });
+
+  // COMPLAINT EVALUATION ENGINE
+  function evaluateComplaints() {
+    const checkedBox = Array.from(document.querySelectorAll('input[name="complaint_chip"]:checked'));
+    
+    // Highlight chip styles
+    document.querySelectorAll('input[name="complaint_chip"]').forEach(cb => {
+      cb.parentElement.classList.toggle('active', cb.checked);
+    });
+
+    const selKeluhanJelas = document.getElementById('keluhan_jelas');
+    const helper = document.getElementById('displayLayananTerkaitHelper');
+    const sameLastVisitAlert = document.getElementById('sameLastVisitAlert');
+    const warningLuarMulut = document.getElementById('warningLuarMulut');
+
+    if (checkedBox.length === 0) {
+      selKeluhanJelas.value = "Tidak";
+      helper.textContent = "Layanan terkait: - (Data contoh, perlu dikonfirmasi petugas)";
+      sameLastVisitAlert.style.display = 'none';
+      warningLuarMulut.style.display = 'none';
+      return { jelas: "Tidak", labels: [], layananTerkait: "-" };
+    }
+
+    // Find items metadata
+    const selectedItems = [];
+    checkedBox.forEach(cb => {
+      for (let g of COMPLAINT_GROUPS) {
+        const found = g.items.find(i => i.id === cb.value);
+        if (found) selectedItems.push(found);
+      }
+    });
+
+    // Warning Di luar Gigi dan Mulut
+    const hasLuarMulut = selectedItems.some(i => i.id === 'c_umum');
+    warningLuarMulut.style.display = hasLuarMulut ? 'flex' : 'none';
+
+    // Check if ALL are 'Ya' AND point to the same valid layanan
+    const allYa = selectedItems.every(i => i.jelas === 'Ya');
+    
+    // Resolve layanan for each
+    const layananList = selectedItems.map(i => {
+      if (i.layanan === 'sesuai dokter sebelumnya') {
+        return (currentPatient && currentPatient.riwayat_kunjungan.length > 0) 
+          ? currentPatient.riwayat_kunjungan[0].layanan 
+          : '-';
+      }
+      return i.layanan;
+    });
+
+    const firstLayanan = layananList[0];
+    const sameLayanan = firstLayanan !== '-' && layananList.every(l => l === firstLayanan);
+
+    const isJelas = allYa && sameLayanan;
+    selKeluhanJelas.value = isJelas ? "Ya" : "Tidak";
+
+    const finalLayanan = sameLayanan ? firstLayanan : "Campuran / Perlu Klarifikasi";
+    helper.textContent = `Layanan terkait: ${finalLayanan} (Data contoh, perlu dikonfirmasi petugas)`;
+
+    // Check match with patient's last visit
+    if (currentPatient && currentPatient.riwayat_kunjungan.length > 0) {
+      const lastV = currentPatient.riwayat_kunjungan[0];
+      if (sameLayanan && firstLayanan === lastV.layanan) {
+        sameLastVisitAlert.style.display = 'block';
+        sameLastVisitAlert.textContent = `💡 Sama dengan kunjungan terakhir (tanggal ${lastV.tanggal} - ${lastV.layanan} bersama ${lastV.dokter})`;
+      } else {
+        sameLastVisitAlert.style.display = 'none';
+      }
+    } else {
+      sameLastVisitAlert.style.display = 'none';
+    }
+
+    return {
+      jelas: isJelas ? "Ya" : "Tidak",
+      labels: selectedItems.map(i => i.label),
+      layananTerkait: finalLayanan
+    };
+  }
+
+  // CHECKBOX VALUE HELPER
+  function getCheckedValues(name) {
+    return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
+  }
+
+  // CORE 21 RULES EVALUATION ENGINE (RULE 1 - RULE 21)
+  function evaluateRules() {
+    // 0. Parameters Pakar
+    const batasTerlambat = parseInt(document.getElementById('param_batas_terlambat').value, 10) || 0;
+    const aturanBatasKeterlambatan = document.getElementById('param_aturan_batas').value;
+
+    // Tahap 1
+    const kondisiChecked = getCheckedValues('kondisi_checkbox');
+    const Kondisi_Perlu_Perhatian_Segera = kondisiChecked.length > 0 ? 'Ada' : 'Tidak Ada';
+    const subgroupPenilaianMedis = document.getElementById('subgroup-penilaian-medis');
+    
+    if (Kondisi_Perlu_Perhatian_Segera === 'Ada') {
+      subgroupPenilaianMedis.style.display = 'flex';
+      document.getElementById('badgeTahap1').textContent = 'Perhatian Segera!';
+      document.getElementById('badgeTahap1').className = 'tag tag-danger';
+    } else {
+      subgroupPenilaianMedis.style.display = 'none';
+      document.getElementById('badgeTahap1').textContent = 'Normal';
+      document.getElementById('badgeTahap1').className = 'tag';
+    }
+
+    const Penilaian_Tenaga_Medis = Kondisi_Perlu_Perhatian_Segera === 'Ada' 
+      ? document.getElementById('penilaian_tenaga_medis').value 
+      : 'Belum dinilai';
+
+    // Tahap 2
+    const Status_Pasien = document.getElementById('status_pasien').value;
+
+    // Tahap 3
+    const Status_Booking = document.getElementById('status_booking').value;
+    const subgroupBooking = document.getElementById('subgroup-booking');
+    const cardTahap4 = document.getElementById('card-tahap-4');
+
+    if (Status_Booking === 'Ada') {
+      subgroupBooking.style.display = 'flex';
+      cardTahap4.style.display = 'none';
+    } else {
+      subgroupBooking.style.display = 'none';
+      cardTahap4.style.display = 'block';
+    }
+
+    const Jadwal_dan_Dokter_Booking = Status_Booking === 'Ada' ? document.getElementById('jadwal_dokter_sesuai').value : '';
+    const Keterlambatan_Menit = Status_Booking === 'Ada' ? (parseInt(document.getElementById('keterlambatan_menit').value, 10) || 0) : 0;
+
+    // Tahap 4
+    const Dokter_Tersedia = Status_Booking === 'Tidak Ada' ? document.getElementById('dokter_tersedia').value : '';
+    const Kapasitas_Dokter = Status_Booking === 'Tidak Ada' ? document.getElementById('kapasitas_dokter').value : '';
+
+    // Tahap 5
+    const compEval = evaluateComplaints();
+    const Keluhan_Jelas = document.getElementById('keluhan_jelas').value;
+    const subgroupKeraguan = document.getElementById('subgroup-keraguan');
+    if (Keluhan_Jelas === 'Tidak') {
+      subgroupKeraguan.style.display = 'flex';
+    } else {
+      subgroupKeraguan.style.display = 'none';
+    }
+    const Keraguan_Setelah_Klarifikasi = Keluhan_Jelas === 'Tidak' ? document.getElementById('keraguan_setelah_klarifikasi').value : 'Tidak Ada';
+
+    const infoKesehatanChecked = getCheckedValues('info_kesehatan_checkbox');
+    const Informasi_Kesehatan_Penting = infoKesehatanChecked.length > 0 ? 'Ada' : 'Tidak Ada';
+
+    // Tahap 6
+    const Nomor_Antrean_Hilang = document.getElementById('nomor_antrean_hilang').value;
+    const subgroupAntreanHilang = document.getElementById('subgroup-antrean-hilang');
+    if (Nomor_Antrean_Hilang === 'Ya') {
+      subgroupAntreanHilang.style.display = 'flex';
+    } else {
+      subgroupAntreanHilang.style.display = 'none';
+    }
+    const Identitas_dan_Data_Antrean_Terverifikasi = Nomor_Antrean_Hilang === 'Ya' ? document.getElementById('antrean_terverifikasi').value : 'Tidak';
+
+    const Pasien_Mengaku_Sudah_Mendaftar = document.getElementById('pasien_tidak_ditemukan').value;
+    const subgroupTidakDitemukan = document.getElementById('subgroup-tidak-ditemukan');
+    if (Pasien_Mengaku_Sudah_Mendaftar === 'Ya') {
+      subgroupTidakDitemukan.style.display = 'flex';
+    } else {
+      subgroupTidakDitemukan.style.display = 'none';
+    }
+    const Pasien_Ditemukan_Setelah_Verifikasi = Pasien_Mengaku_Sudah_Mendaftar === 'Ya' ? document.getElementById('pasien_ditemukan_verif').value : 'Tidak';
+
+    // Tahap 7
+    const keluhanFreeText = document.getElementById('keluhan_tambahan').value.trim();
+    const Keluhan_Utama_Tercatat = (compEval.labels.length > 0 || keluhanFreeText.length > 0) ? 'Ya' : 'Tidak';
+    const Informasi_Diperlukan_Petugas_Berikutnya = document.getElementById('info_diperlukan_berikutnya').value;
+    const Informasi_Pasien_Belum_Jelas = document.getElementById('info_pasien_belum_jelas').value;
+    const Informasi_Pasien_Berubah = document.getElementById('info_pasien_berubah').value;
+
+    // === EXACT 21 RULES EXECUTION ===
+    const triggered = [];
+
+    // RULE 1
+    if (Kondisi_Perlu_Perhatian_Segera === 'Ada') {
+      triggered.push({
+        stage: 1,
+        ruleNum: 1,
+        then: "Hubungi Perawat atau Tenaga Medis Terlebih Dahulu",
+        reason: `Kondisi_Perlu_Perhatian_Segera = Ada (${kondisiChecked.join(', ')})`
+      });
+    }
+
+    // RULE 2
+    if (Penilaian_Tenaga_Medis === 'Tidak Perlu Segera') {
+      triggered.push({
+        stage: 1,
+        ruleNum: 2,
+        then: "Kembali ke Alur Pendaftaran Biasa (Periksa Status Pasien, Booking, dan Antrean)",
+        reason: `Penilaian_Tenaga_Medis = Tidak Perlu Segera`
+      });
+    }
+
+    // RULE 3
+    if (Penilaian_Tenaga_Medis === 'Perlu Segera') {
+      triggered.push({
+        stage: 1,
+        ruleNum: 3,
+        then: "Tetap Didaftarkan; Penanganan Didahulukan Sesuai Arahan Tenaga Medis; Kelengkapan Administrasi Dilengkapi Setelahnya atau oleh Pendamping Sesuai Prosedur RSGM",
+        reason: `Penilaian_Tenaga_Medis = Perlu Segera`
+      });
+    }
+
+    // RULE 4
+    if ((Kondisi_Perlu_Perhatian_Segera === 'Tidak Ada' || Penilaian_Tenaga_Medis === 'Tidak Perlu Segera') && Status_Pasien === 'Baru') {
+      const reasonKondisi = Kondisi_Perlu_Perhatian_Segera === 'Tidak Ada' ? 'Kondisi = Tidak Ada' : 'Penilaian Medis = Tidak Perlu Segera';
+      triggered.push({
+        stage: 2,
+        ruleNum: 4,
+        then: "Minta Data Identitas dan Buat Rekam Medis Sesuai Prosedur",
+        reason: `(${reasonKondisi}) DAN Status_Pasien = Baru`
+      });
+    }
+
+    // RULE 5
+    if ((Kondisi_Perlu_Perhatian_Segera === 'Tidak Ada' || Penilaian_Tenaga_Medis === 'Tidak Perlu Segera') && Status_Pasien === 'Lama') {
+      const reasonKondisi = Kondisi_Perlu_Perhatian_Segera === 'Tidak Ada' ? 'Kondisi = Tidak Ada' : 'Penilaian Medis = Tidak Perlu Segera';
+      triggered.push({
+        stage: 2,
+        ruleNum: 5,
+        then: "Cari Data atau Nomor Rekam Medis yang Sudah Ada",
+        reason: `(${reasonKondisi}) DAN Status_Pasien = Lama`
+      });
+    }
+
+    // RULE 6
+    if (Status_Booking === 'Ada' && Jadwal_dan_Dokter_Booking === 'Ya') {
+      triggered.push({
+        stage: 3,
+        ruleNum: 6,
+        then: "Lanjutkan Sesuai Jadwal dan Kondisi Antrean",
+        reason: `Status_Booking = Ada DAN Jadwal_dan_Dokter_Booking = Ya`
+      });
+    }
+
+    // RULE 7
+    if (Status_Booking === 'Ada' && Keterlambatan_Menit <= batasTerlambat) {
+      triggered.push({
+        stage: 3,
+        ruleNum: 7,
+        then: "Periksa Data Booking dan Kondisi Antrean untuk Melanjutkan Pelayanan",
+        reason: `Status_Booking = Ada DAN Keterlambatan_Menit (${Keterlambatan_Menit}) <= batas (${batasTerlambat} menit)`
+      });
+    }
+
+    // RULE 8
+    if (Status_Booking === 'Ada' && Keterlambatan_Menit > batasTerlambat) {
+      triggered.push({
+        stage: 3,
+        ruleNum: 8,
+        then: "Periksa Kondisi Antrean dan Konfirmasi Penyesuaian kepada Petugas Berwenang",
+        reason: `Status_Booking = Ada DAN Keterlambatan_Menit (${Keterlambatan_Menit}) > batas (${batasTerlambat} menit)`
+      });
+    }
+
+    // RULE 9
+    if (Status_Booking === 'Ada' && aturanBatasKeterlambatan === 'Belum jelas') {
+      triggered.push({
+        stage: 3,
+        ruleNum: 9,
+        then: "Konfirmasi kepada Penanggung Jawab Pelayanan agar Keputusan Seragam Antarpetugas",
+        reason: `Status_Booking = Ada DAN aturan_batas_keterlambatan = Belum jelas`
+      });
+    }
+
+    // RULE 10
+    if (Status_Booking === 'Tidak Ada' && Dokter_Tersedia === 'Ya' && Kapasitas_Dokter === 'Tersedia') {
+      triggered.push({
+        stage: 4,
+        ruleNum: 10,
+        then: "Arahkan ke Antrean Walk-in",
+        reason: `Status_Booking = Tidak Ada DAN Dokter_Tersedia = Ya DAN Kapasitas_Dokter = Tersedia`
+      });
+    }
+
+    // RULE 11
+    if (Status_Booking === 'Tidak Ada' && (Dokter_Tersedia === 'Tidak' || Kapasitas_Dokter === 'Penuh')) {
+      const reasonDokter = Dokter_Tersedia === 'Tidak' ? 'Dokter_Tersedia = Tidak' : 'Kapasitas_Dokter = Penuh';
+      triggered.push({
+        stage: 4,
+        ruleNum: 11,
+        then: "Jelaskan Pilihan: Tawarkan Jadwal Lain atau Dokter Lain yang Sesuai",
+        reason: `Status_Booking = Tidak Ada DAN (${reasonDokter})`
+      });
+    }
+
+    // RULE 12
+    if (Keluhan_Jelas === 'Ya') {
+      triggered.push({
+        stage: 5,
+        ruleNum: 12,
+        then: "Arahkan Pasien ke Dokter atau Poli yang Sesuai",
+        reason: `Keluhan_Jelas = Ya (Keluhan mengarah seragam ke ${compEval.layananTerkait})`
+      });
+    }
+
+    // RULE 13
+    if (Keluhan_Jelas === 'Tidak') {
+      triggered.push({
+        stage: 5,
+        ruleNum: 13,
+        then: "Perjelas Keluhan dengan Bertanya Lebih Lanjut kepada Pasien (Tidak Boleh Menebak)",
+        reason: `Keluhan_Jelas = Tidak`
+      });
+    }
+
+    // RULE 14
+    if (Keluhan_Jelas === 'Tidak' && Keraguan_Setelah_Klarifikasi === 'Ada') {
+      triggered.push({
+        stage: 5,
+        ruleNum: 14,
+        then: "Minta Arahan Petugas Berwenang atau Arahkan ke Pemeriksaan Awal Sesuai Prosedur; Pemutus Layanan Akhir: Petugas Berwenang",
+        reason: `Keluhan_Jelas = Tidak DAN Keraguan_Setelah_Klarifikasi = Ada`
+      });
+    }
+
+    // RULE 15
+    if (Informasi_Kesehatan_Penting === 'Ada') {
+      triggered.push({
+        stage: 5,
+        ruleNum: 15,
+        then: "Catat Sesuai Prosedur dan Teruskan kepada Perawat atau Dokter; Keputusan Tindakan Medis Ditentukan Tenaga Medis",
+        reason: `Informasi_Kesehatan_Penting = Ada (${infoKesehatanChecked.join(', ')})`
+      });
+    }
+
+    // RULE 16
+    if (Nomor_Antrean_Hilang === 'Ya') {
+      triggered.push({
+        stage: 6,
+        ruleNum: 16,
+        then: "Periksa Identitas dan Cocokkan dengan Data Pendaftaran atau Booking",
+        reason: `Nomor_Antrean_Hilang = Ya`
+      });
+    }
+
+    // RULE 17
+    if (Nomor_Antrean_Hilang === 'Ya' && Identitas_dan_Data_Antrean_Terverifikasi === 'Ya') {
+      triggered.push({
+        stage: 6,
+        ruleNum: 17,
+        then: "Minta Petugas Berwenang Menentukan Nomor Diterbitkan Ulang atau Pasien Menyesuaikan Antrean",
+        reason: `Nomor_Antrean_Hilang = Ya DAN Identitas_dan_Data_Antrean_Terverifikasi = Ya`
+      });
+    }
+
+    // RULE 18
+    if (Pasien_Mengaku_Sudah_Mendaftar === 'Ya') {
+      triggered.push({
+        stage: 6,
+        ruleNum: 18,
+        then: "Cocokkan Identitas, Jadwal, dan Data Pendaftaran (Jangan Langsung Minta Daftar Ulang)",
+        reason: `Pasien_Mengaku_Sudah_Mendaftar_Tetapi_Tidak_Ditemukan = Ya`
+      });
+    }
+
+    // RULE 19
+    if (Pasien_Mengaku_Sudah_Mendaftar === 'Ya' && Pasien_Ditemukan_Setelah_Verifikasi === 'Tidak') {
+      triggered.push({
+        stage: 6,
+        ruleNum: 19,
+        then: "Konfirmasi kepada Petugas Terkait agar Tidak Terjadi Pendaftaran Ganda atau Kesalahan Antrean",
+        reason: `Pasien_Mengaku_Sudah_Mendaftar = Ya DAN Pasien_Ditemukan_Setelah_Verifikasi = Tidak`
+      });
+    }
+
+    // RULE 20
+    if (Keluhan_Utama_Tercatat === 'Ya' && Informasi_Diperlukan_Petugas_Berikutnya === 'Ya') {
+      triggered.push({
+        stage: 7,
+        ruleNum: 20,
+        then: "Teruskan Catatan kepada Petugas Berikutnya sehingga Pasien Tidak Perlu Mengulang Informasi",
+        reason: `Keluhan_Utama_Tercatat = Ya DAN Informasi_Diperlukan_Petugas_Berikutnya = Ya`
+      });
+    }
+
+    // RULE 21
+    if (Informasi_Pasien_Belum_Jelas === 'Ya' || Informasi_Pasien_Berubah === 'Ya') {
+      const reasonList = [];
+      if (Informasi_Pasien_Belum_Jelas === 'Ya') reasonList.push('Informasi_Pasien_Belum_Jelas = Ya');
+      if (Informasi_Pasien_Berubah === 'Ya') reasonList.push('Informasi_Pasien_Berubah = Ya');
+      triggered.push({
+        stage: 7,
+        ruleNum: 21,
+        then: "Konfirmasi Ulang kepada Pasien dan Perbarui Catatan",
+        reason: reasonList.join(' ATAU ')
+      });
+    }
+
+    currentTriggeredRules = triggered;
+
+    // === RENDER TAB 4 (HASIL ALUR) ===
+    const statusUtamaCard = document.getElementById('statusUtamaCard');
+    const statusUtamaText = document.getElementById('statusUtamaText');
+
+    if (Kondisi_Perlu_Perhatian_Segera === 'Ada' && Penilaian_Tenaga_Medis === 'Belum dinilai') {
+      statusUtamaCard.className = 'status-card status-red';
+      statusUtamaText.textContent = 'MENUNGGU PENILAIAN TENAGA MEDIS';
+      lastDecisionStatus = 'MENUNGGU PENILAIAN TENAGA MEDIS';
+    } else if (Penilaian_Tenaga_Medis === 'Perlu Segera') {
+      statusUtamaCard.className = 'status-card status-red';
+      statusUtamaText.textContent = 'DITANGANI TENAGA MEDIS TERLEBIH DAHULU';
+      lastDecisionStatus = 'DITANGANI TENAGA MEDIS TERLEBIH DAHULU';
+    } else {
+      statusUtamaCard.className = 'status-card status-blue';
+      statusUtamaText.textContent = 'ALUR PENDAFTARAN BIASA';
+      lastDecisionStatus = 'ALUR PENDAFTARAN BIASA';
+    }
+
+    document.getElementById('triggeredCountBadge').textContent = `${triggered.length} Aturan`;
+    const container = document.getElementById('triggeredRulesContainer');
+    container.innerHTML = '';
+
+    if (triggered.length === 0) {
+      container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted);">Tidak ada aturan yang terpenuhi saat ini.</div>';
+    } else {
+      for (let s = 1; s <= 7; s++) {
+        const stageRules = triggered.filter(r => r.stage === s);
+        if (stageRules.length > 0) {
+          const grp = document.createElement('div');
+          grp.style.marginBottom = '12px';
+          grp.innerHTML = `<div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Tahap ${s}</div>`;
+          stageRules.forEach(r => {
+            const item = document.createElement('div');
+            item.className = 'rule-item';
+            item.innerHTML = `
+              <div><span class="rule-badge">RULE ${r.ruleNum}</span></div>
+              <div class="rule-then">"${escapeHtml(r.then)}"</div>
+              <div class="rule-reason">Alasan (Nilai Aktual): ${escapeHtml(r.reason)}</div>
+            `;
+            grp.appendChild(item);
+          });
+          container.appendChild(grp);
+        }
+      }
+    }
+
+    // Handover Summary Section
+    const patientName = currentPatient ? currentPatient.nama : (searchInput.value.trim() || 'Pasien Baru');
+    const patientRM = currentPatient ? currentPatient.no_rm : '(Belum ada RM)';
+    document.getElementById('handoverPatientIdent').textContent = `${patientName} (${patientRM})`;
+
+    const allComplaints = [...compEval.labels];
+    if (keluhanFreeText) allComplaints.push(`Catatan: "${keluhanFreeText}"`);
+    document.getElementById('handoverKeluhanDisplay').innerHTML = allComplaints.length > 0 
+      ? allComplaints.map(c => `&bull; ${escapeHtml(c)}`).join('<br>') 
+      : '<em>Belum ada keluhan dicatat</em>';
+
+    document.getElementById('handoverInfoKesDisplay').innerHTML = infoKesehatanChecked.length > 0
+      ? infoKesehatanChecked.map(k => `&bull; <strong style="color:var(--danger);">${escapeHtml(k)}</strong>`).join('<br>')
+      : '<em>Tidak ada catatan khusus</em>';
+
+    const handoverAlerts = document.getElementById('handoverAlertsContainer');
+    handoverAlerts.innerHTML = '';
+    if (triggered.some(r => r.ruleNum === 15)) {
+      const f = document.createElement('div');
+      f.className = 'alert-flag warning';
+      f.innerHTML = `<span>⚠️</span><div><strong>Peringatan Info Kesehatan (Rule 15):</strong> Teruskan informasi ini kepada perawat atau dokter poliklinik. Keputusan tindakan medis oleh tenaga medis.</div>`;
+      handoverAlerts.appendChild(f);
+    }
+    if (triggered.some(r => r.ruleNum === 21)) {
+      const f = document.createElement('div');
+      f.className = 'alert-flag info';
+      f.innerHTML = `<span>🔄</span><div><strong>Verifikasi Informasi Pasien (Rule 21):</strong> Konfirmasi ulang kepada pasien dan perbarui catatan karena terdapat data yang belum jelas atau berubah.</div>`;
+      handoverAlerts.appendChild(f);
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // COPY HANDOVER SUMMARY
+  document.getElementById('btnSalinRingkasan').addEventListener('click', () => {
+    const pName = currentPatient ? currentPatient.nama : 'Pasien';
+    const pRM = currentPatient ? currentPatient.no_rm : '-';
+    const keluhan = document.getElementById('handoverKeluhanDisplay').innerText;
+    const infoKes = document.getElementById('handoverInfoKesDisplay').innerText;
+    const rulesList = currentTriggeredRules.map(r => `- RULE ${r.ruleNum}: ${r.then}`).join('\n');
+
+    const summary = `=== RINGKASAN SERAH TERIMA RSGM MARANATHA ===\n` +
+      `Pasien: ${pName} (${pRM})\n` +
+      `Status Alur Utama: ${lastDecisionStatus}\n` +
+      `Keluhan: ${keluhan.replace(/\n/g, ', ')}\n` +
+      `Informasi Kesehatan Penting: ${infoKes.replace(/\n/g, ', ')}\n` +
+      `Aturan Pakar Terpicu:\n${rulesList}\n` +
+      `Waktu: ${new Date().toLocaleTimeString('id-ID')} WIB\n` +
+      `==============================================`;
+
+    navigator.clipboard.writeText(summary).then(() => {
+      showToast('Ringkasan serah terima berhasil disalin ke clipboard!');
+    }).catch(() => {
+      showToast('Gagal menyalin, periksa izin peramban.');
+    });
+  });
+
+  // SAVE VISIT TO TODAY'S QUEUE (SESSION ONLY)
+  document.getElementById('btnSimpanKunjungan').addEventListener('click', () => {
+    const pName = currentPatient ? currentPatient.nama : (searchInput.value.trim() || 'Pasien Baru');
+    const pRM = currentPatient ? currentPatient.no_rm : '(Pasien Baru)';
+    const isBooking = document.getElementById('status_booking').value === 'Ada';
+    const prefix = isBooking ? 'B' : 'W';
+    const randNum = Math.floor(100 + Math.random() * 900);
+    const queueNo = `${prefix}-${randNum}`;
+    
+    const dokter = isBooking 
+      ? (currentPatient && currentPatient.booking_hari_ini ? currentPatient.booking_hari_ini.dokter : 'drg. Anita, Sp.KG') 
+      : document.getElementById('select_walkin_dokter').value;
+    
+    const layanan = isBooking 
+      ? (currentPatient && currentPatient.booking_hari_ini ? currentPatient.booking_hari_ini.layanan : 'Konservasi') 
+      : 'Konservasi / Walk-in';
+
+    const timeStr = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} (${isBooking ? 'Booking' : 'Walk-in'})`;
+
+    queue.unshift({
+      no: queueNo,
+      nama: pName,
+      rm: pRM,
+      layanan: layanan,
+      dokter: dokter,
+      waktu: timeStr,
+      status: lastDecisionStatus
+    });
+
+    renderQueueUI();
+    showToast(`Kunjungan tersimpan! Nomor antrean baru: ${queueNo}`);
+    switchTab('tab-antrean');
+  });
+
+  // RESET ALL SESSION DATA & FORMS
+  function resetSession() {
+    doctors = JSON.parse(JSON.stringify(INITIAL_DOCTORS));
+    patients = JSON.parse(JSON.stringify(INITIAL_PATIENTS));
+    queue = JSON.parse(JSON.stringify(INITIAL_QUEUE));
+    currentPatient = null;
+
+    // Reset Parameters
+    document.getElementById('param_batas_terlambat').value = '10';
+    document.getElementById('param_aturan_batas').value = 'Belum jelas';
+
+    // Reset Search & Forms
+    searchInput.value = '';
+    document.getElementById('admissionForm').reset();
+    document.getElementById('penilaian_tenaga_medis').value = 'Belum dinilai';
+    document.getElementById('status_pasien').value = 'Lama';
+    document.getElementById('status_booking').value = 'Tidak Ada';
+    document.getElementById('jadwal_dokter_sesuai').value = 'Ya';
+    document.getElementById('keterlambatan_menit').value = '0';
+    document.getElementById('keluhan_tambahan').value = '';
+    document.getElementById('keluhan_jelas').value = 'Tidak';
+    document.getElementById('keraguan_setelah_klarifikasi').value = 'Tidak Ada';
+    document.getElementById('status_perubahan_info').value = 'Tetap';
+    document.getElementById('nomor_antrean_hilang').value = 'Tidak';
+    document.getElementById('antrean_terverifikasi').value = 'Ya';
+    document.getElementById('pasien_tidak_ditemukan').value = 'Tidak';
+    document.getElementById('pasien_ditemukan_verif').value = 'Tidak';
+    document.getElementById('info_diperlukan_berikutnya').value = 'Ya';
+    document.getElementById('info_pasien_belum_jelas').value = 'Tidak';
+    document.getElementById('info_pasien_berubah').value = 'Tidak';
+    activePatientBanner.style.display = 'none';
+
+    initComplaintsUI();
+    renderDoctorsUI();
+    renderQueueUI();
+    renderSearchPatients('');
+    evaluateRules();
+    showToast('Seluruh data sesi simulasi telah dikembalikan ke awal.');
+  }
+
+  globalResetBtn.addEventListener('click', resetSession);
+
+  // LIVE EVENT LISTENERS FOR RULES EVALUATION
+  document.getElementById('admissionForm').addEventListener('input', evaluateRules);
+  document.getElementById('admissionForm').addEventListener('change', evaluateRules);
+  document.getElementById('param_batas_terlambat').addEventListener('input', evaluateRules);
+  document.getElementById('param_aturan_batas').addEventListener('change', evaluateRules);
+
+  // INITIALIZATION
+  initComplaintsUI();
+  renderDoctorsUI();
+  renderQueueUI();
+  renderSearchPatients('');
+  selectPatient(patients[0]); // default select Budi Santoso for smooth start
+  switchTab('tab-cari');
+</script>
+</body>
+</html>

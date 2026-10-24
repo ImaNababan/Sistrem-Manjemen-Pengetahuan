@@ -1,0 +1,6 @@
+{
+  "name": "Penentu Alur Pelayanan Pasien RSGM",
+  "description": "Prototype pembelajaran Knowledge Management untuk alur pelayanan pendaftaran pasien di Rumah Sakit Gigi dan Mulut (RSGM) Maranatha berbasis aturan pakar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
